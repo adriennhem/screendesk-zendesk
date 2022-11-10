@@ -1,0 +1,25 @@
+{
+  "name": "Screendesk",
+  "author": {
+    "name": "Screendesk",
+    "email": "support@screendesk.io",
+    "url": "https://screendesk.io"
+  },
+  "defaultLocale": "en",
+  "private": false,
+  "location": {
+    "support": {
+      "ticket_sidebar": {
+        "url": "https://app.screendesk.io/apps/zendesk/iframe",
+        "flexible": true
+      },
+      "ticket_editor": {
+        "url": "https://app.screendesk.io/apps/zendesk/ticket-editor",
+        "flexible": true ,
+        "autoLoad": true
+      }
+    }
+  },
+  "version": "1.0.0",
+  "frameworkVersion": "2.0"
+}
