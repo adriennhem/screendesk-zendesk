@@ -1,0 +1,194 @@
+<% if @account_setting.present? %>
+<div id="actions-container" class="text-left">   
+    <a id="live-session" href="#" class="font-medium mb-2 hidden pb-2 w-full block text-xs hover:text-rose-600 border-b flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+          </svg>
+          Live Screen Sharing</a>
+    <a id="request-recording" href="#" class="font-medium pb-2 w-full block text-xs border-b hover:text-rose-600 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+            <path stroke-linecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+        Request Recording</a>
+    <a id="send-recording" target="_blank" href="#" class="font-medium w-full block mt-2 pb-2 border-b text-xs hover:text-rose-600 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+          </svg>          
+        Send Recording</a>
+</div>
+<h3 id="previous-recordings" class="text-sm mb-1 mt-3 font-medium">Previous Recordings</h3>
+<div id="recordings-container">
+</div>
+<a class="absolute bottom-0 text-xs underline mt-4 hover:text-rose-600" target="_blank" href="https://app.screendesk.io">Visit Dashboard</a>
+
+    <script>
+        // # Set up
+        var client = ZAFClient.init();
+
+        // # Variables
+        let userEmail, customerEmail, capability, ticketId, userKey, accountKey, recordings = {}; 
+
+        // # Elements
+        const requestBtn = document.getElementById("request-recording");
+        const sendBtn = document.getElementById("send-recording");
+        const recordingsContainer = document.getElementById("recordings-container");
+        const actionsContainer = document.getElementById("actions-container");
+        const liveBtn = document.getElementById("live-session");
+        const previousRecordings = document.getElementById("previous-recordings");
+
+
+        client.on('app.registered', async function() {
+            capability = await client.get('ticket.editor.capabilities.richText')
+            if (capability['ticket.editor.capabilities.richText'] === false) {
+                client.invoke('resize', { width: '200px', height: '250px' })
+                liveBtn.classList.remove('hidden');
+            } else {
+                client.invoke('resize', { width: '200px', height: '230px' })
+            }
+        });
+
+        async function getUserEmail() {
+            const data = await client.get('currentUser');
+            userEmail = data.currentUser.email;
+            return userEmail;
+        }
+
+        // it's possible that the customer email is not set
+        async function getTicketDetails() {
+            const data = await client.get('ticket');
+            customerEmail = data['ticket']['requester']['email'];
+            ticketId = data['ticket']['id'];
+            return ticketId;
+        }
+
+        async function getLink(source) {
+            const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/create-link', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_key: userKey,
+                    ticket_id: ticketId,
+                    account_key: accountKey,
+                    source: source
+                })
+            })
+           const data = await response.json();
+           if (data.status === "success") {
+               return data.link;
+           }
+        }
+
+        async function getDetailsFromServer() {
+            const ticketId  = await getTicketDetails();
+            const userEmail = await getUserEmail();
+            const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/get-details', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                user_email: userEmail,
+                ticket_id: ticketId,
+                subdomain: '<%= @origin %>',
+                })
+            });
+            const data = await response.json();
+            if (data.status == 'success') {
+                userKey = data.user_key;
+                accountKey = data.account_key;
+                sendBtn.href = `<%= Rails.configuration.variables[:base_url] %>recordings/new?zid=${ticketId}&ak=${data.account_key}&key=${data.user_key}&src=srz`;
+            } else {
+                actionsContainer.innerHTML = `<p class="text-sm text-gray-500">You need to have a Screendesk account in order to use this app.</p>`;
+                previousRecordings.classList.add('hidden');
+            }
+        }
+
+        // Get the recordings
+        async function getRecordings() {
+            const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/get-recordings', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                user_key: userKey,
+                account_key: accountKey,
+                customer_email: customerEmail,
+                })
+            });
+            const data = await response.json();
+            recordingsContainer.innerHTML = '';
+            if (data.status == 'success') {
+                recordings = data.recordings;
+                if (recordings.length > 0) {
+                    const list = document.createElement('ul');
+                    list.classList.add('list-disc', 'list-inside', 'text-sm');
+                    recordingsContainer.appendChild(list);
+                    const recordingsList = document.getElementsByTagName('ul')[0]; 
+                    recordings.forEach(recording => {
+                        const listItem = document.createElement('li');
+                        listItem.classList.add('text-xs', 'mt-2', 'list-none');
+                        listItem.innerHTML = `<a href="<%= Rails.configuration.variables[:base_url] %>recordings/${recording.uuid}" class="text-gray-500 hover:text-rose-600" target="_blank">${recording.created_at} - ${recording.duration} min</a>`;
+                        recordingsList.appendChild(listItem);
+                    })
+                } else {
+                    recordingsContainer.innerHTML = `<p class="text-sm text-gray-500">No recordings found</p>`;
+         4       }
+            } else {
+                recordingsContainer.innerHTML = ``;
+            }
+        }
+
+        client.on('app.registered', async function() {
+            await getDetailsFromServer();
+            await getRecordings();
+
+            requestBtn.addEventListener("click", async function(e) {
+                e.preventDefault();
+                const data = await getLink("rrz"); 
+                if (capability['ticket.editor.capabilities.richText'] === true) {
+                    client.invoke('ticket.editor.insert', `<a href="<%= Rails.configuration.variables[:base_url] %>r/${data}">Click here to record your screen</a>`);
+                } else {
+                    client.invoke('ticket.editor.insert', `Click here to record your screen: <%= Rails.configuration.variables[:base_url] %>r/${data}`);
+                }               
+            });
+
+            liveBtn.addEventListener("click", async function(e) {
+                e.preventDefault();
+                const data = await getLink("lsz"); 
+                client.invoke('ticket.editor.insert', `Join the live session here: <%= Rails.configuration.variables[:base_url] %>r/${data}`);
+            });
+        });
+
+        client.on('ticket.updated', async function() {
+            await getRecordings();
+        });
+    </script>
+<% else %> 
+<div class="text-center">
+    <p class="elements text-sm mt-2 mx-auto">Sign in to connect your account</p>
+    <a id="signin-button" href="<%= @origin %>/oauth/authorizations/new?response_type=code&client_id=zdg-screendesk&redirect_uri=<%= Rails.configuration.variables[:zendesk_redirect_uri]%>&scope=read%20write&state=<%= @origin %>" target="_blank" class="elements text-center border w-1/2 mx-auto p-1 mt-4 block btn-primary outline">Sign in</a>
+</div>
+<p class="elements text-xs mt-2 mx-auto absolute bottom-0 left-0">Get help: support@screendesk.io</p>
+
+
+    <script>
+        var client = ZAFClient.init();
+
+        const signinBtn = document.getElementById('signin-button');
+        const body = document.querySelector('body');
+        const elements = document.querySelectorAll('.elements');
+
+        signinBtn.addEventListener('click', function(e) {
+            elements.forEach(element => {
+                element.classList.add('hidden');
+            });
+            const p = document.createElement('p');
+            p.classList.add('text-sm', 'mt-2', 'mx-auto');
+            p.textContent = 'Please refresh the page once you have connected your account.';
+            body.append(p);
+        });
+    </script>
+<% end %>

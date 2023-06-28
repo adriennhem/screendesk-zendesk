@@ -1,0 +1,143 @@
+<div id="actions-container" class="text-left p-2 pl-4">   
+    <a href="https://app.screendesk.io" target="_blank"><%= image_tag "logo_new.svg", class: "mb-6 mt-3 h-5" %></a>
+    <a id="live-session" href="#" class="font-medium mb-2 hidden pb-3 w-full block text-xs hover:text-rose-600 border-b flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+          </svg>
+        Live Screen Share</a>
+    <a id="request-recording" href="#" class="font-medium pb-3 w-full block text-xs border-b hover:text-rose-600 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+            <path stroke-linecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+                    
+        Request Recording</a>
+    <a id="send-recording" target="_blank" href="#" class="font-medium w-full block mt-2 pb-2 text-xs hover:text-rose-600 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+          </svg>          
+        Send Recording</a>
+</div>
+    <script>
+        // Set up
+        var client = ZAFClient.init();
+        client.invoke('resize', { width: '180px', height: '140px' })
+
+        // Variables
+        let userEmail, capability, customerEmail, ticketId, userKey, accountKey, recordings = {}; 
+
+        client.on('pane.activated', async function() {
+            capability = await client.get('ticket.editor.capabilities.richText')
+            if (capability['ticket.editor.capabilities.richText'] === false) {
+                client.invoke('resize', { width: '200px', height: '170px' })
+                document.getElementById('live-session').classList.remove('hidden');
+            } 
+        });     
+
+        // Elements
+        const requestBtn = document.getElementById("request-recording");
+        const sendBtn = document.getElementById("send-recording");
+        const liveBtn = document.getElementById("live-session");
+        const actionsContainer = document.getElementById("actions-container");
+
+        async function getUserEmail() {
+            const data = await client.request('/api/v2/users/me.json');
+            userEmail = data.user.email;
+            return userEmail;
+        }
+
+        async function getTicketDetails() {
+            const data = await client.get('ticket');
+            customerEmail = data['ticket']['requester']['email'];
+            ticketId = data['ticket']['id'];
+            return { customerEmail, ticketId };
+        }
+
+        async function getLink(source) {
+            const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/create-link', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_key: userKey,
+                    ticket_id: ticketId,
+                    account_key: accountKey,
+                    source: source
+                })
+            })
+           const data = await response.json();
+           if (data.status === "success") {
+               return data.link;
+           }
+        }
+
+        async function getDetailsFromServer() {
+            const { customerEmail, ticketId } = await getTicketDetails();
+            const userEmail = await getUserEmail();
+            const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/get-details', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                user_email: userEmail,
+                customer_email: customerEmail,
+                ticket_id: ticketId,
+                subdomain: '<%= @origin %>',
+                })
+            });
+            const data = await response.json();
+            if (data.status == 'success') {
+                userKey = data.user_key;
+                accountKey = data.account_key;
+                sendBtn.href = `<%= Rails.configuration.variables[:base_url] %>recordings/new?zid=${ticketId}&ak=${data.account_key}&key=${data.user_key}&src=srz`;
+            } else {
+                if (data.error == "Account not found") {
+                    client.invoke('resize', { width: '200px', height: '220px' })
+                    actionsContainer.innerHTML = `
+                    <div class="text-center mx-auto>
+                    <a href="https://app.screendesk.io" target="_blank"><%= image_tag "logo_new.svg", class: "mb-6 mt-3 h-5 mx-auto" %></a>
+                    <p class="elements text-sm mt-2">Sign in to connect your account. Refresh this page once connected.</p>
+                    <a id="signin-button" href="<%= @origin %>/oauth/authorizations/new?response_type=code&client_id=zdg-screendesk&redirect_uri=<%= Rails.configuration.variables[:base_url] %>apps/zendesk/connect&scope=read%20write&state=<%= @origin %>" target="_blank" class="inline-block border w-1/2 p-1 mt-4 btn-primary outline">Sign in</a>
+                    </div>`;
+                } else if (data.error == "Please ask an admin to add you to Screendesk") {
+                    client.invoke('resize', { width: '200px', height: '150px' })
+                    actionsContainer.innerHTML = `
+                    <div class="text-center mx-auto>
+                    <a href="https://app.screendesk.io" target="_blank"><%= image_tag "logo_new.svg", class: "mb-6 mt-3 h-5 mx-auto" %></a>
+                    <p class="elements text-sm mt-2 text-gray-500">You need to have a Screendesk account in order to use this app.</p>
+                    </div>
+                    `;   
+                }
+            }
+        }
+
+        function loadPage() {
+            getDetailsFromServer().then(() => {
+            sendBtn.addEventListener('click', function(e) {
+                client.invoke('app.close');
+            });
+
+            requestBtn.addEventListener("click", async function(e) {
+                e.preventDefault();
+                const data = await getLink("rrz"); 
+                const capability = await client.get('ticket.editor.capabilities.richText')
+                if (capability['ticket.editor.capabilities.richText'] === true) {
+                    client.invoke('ticket.editor.insert', `<a href="<%= Rails.configuration.variables[:base_url] %>r/${data}">Click here to record your screen</a>`);
+                } else {
+                    client.invoke('ticket.editor.insert', `Click here to record your screen: <%=  Rails.configuration.variables[:base_url] %>r/${data}`);
+                }               
+                client.invoke('app.close');
+            });
+
+            liveBtn.addEventListener("click", async function(e) {
+                e.preventDefault();
+                const data = await getLink("lsz"); 
+                client.invoke('ticket.editor.insert', `Join the live session here: <%= Rails.configuration.variables[:base_url] %>r/${data}`);
+                client.invoke('app.close');
+            });
+        });  
+        }
+
+        loadPage();
+    </script>
