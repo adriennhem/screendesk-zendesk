@@ -1,194 +1,379 @@
 <% if @account_setting.present? %>
-<div id="actions-container" class="text-left">   
-    <a id="live-session" href="#" class="font-medium mb-2 hidden pb-2 w-full block text-xs hover:text-rose-600 border-b flex items-center">
+  <div id="actions-container" class="text-left">
+    <% if is_pro?(@account_setting.account) || @account_setting.account.trial? %>
+      <a id="live-session" href="#" class="font-medium mb-2 pb-2 w-full block text-xs hover:text-rose-600 border-b flex items-center">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-          </svg>
-          Live Screen Sharing</a>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+        </svg>
+        Live Screen Sharing</a>
+    <% else %>
+      <a href="https://app.screendesk.io/pricing" target="_blank" class="font-medium mb-2 pb-2 w-full block text-xs hover:text-rose-600 border-b flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+        </svg>
+        Live Screen Sharing <span class="ml-2 inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800">Pro</span>
+      </a>
+    <% end %>
     <a id="request-recording" href="#" class="font-medium pb-2 w-full block text-xs border-b hover:text-rose-600 flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
-            <path stroke-linecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
-          </svg>
-        Request Recording</a>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+        <path stroke-linecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+      </svg>
+      Request Recording</a>
     <a id="send-recording" target="_blank" href="#" class="font-medium w-full block mt-2 pb-2 border-b text-xs hover:text-rose-600 flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-          </svg>          
-        Send Recording</a>
-</div>
-<h3 id="previous-recordings" class="text-sm mb-1 mt-3 font-medium">Previous Recordings</h3>
-<div id="recordings-container">
-</div>
-<a class="absolute bottom-0 text-xs underline mt-4 hover:text-rose-600" target="_blank" href="https://app.screendesk.io">Visit Dashboard</a>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+      </svg>
+      Send Recording</a>
+    <a id="libraryBtn" href="#" class="font-medium w-full block mt-2 pb-2 text-xs hover:text-rose-600 flex items-center">
+      <svg
+   class="w-4 h-4 mr-2"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"><rect
+      x="7"
+      y="3"
+      width="14"
+      height="14"
+      rx="2"
+      stroke="currentColor"
+      stroke-width="1.5"></rect><path
+      d="M3 7V13C3 16.7712 3 18.6569 4.17157 19.8284C5.34315 21 7.22876 21 11 21H17"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"></path><path
+      d="M16.9088 9.82782L12.0019 6.9283C11.8686 6.84952 11.7002 6.94563 11.7002 7.10049V12.8995C11.7002 13.0544 11.8686 13.1505 12.0019 13.0717L16.9088 10.1722C17.0398 10.0948 17.0398 9.90523 16.9088 9.82782Z"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"></path>
+      </svg>
+      Send from Library</a>
+    <h3 id="previous-recordings" class="text-sm mb-1 mt-3 font-medium">Previous Recordings</h3>
+    <div id="recordings-container" class="mb-2">
+    </div>
+  </div>
+  <div id="library" class="hidden text-left">
+    <div class="mt-3 mb-4 pl-4 pb-4 pr-4 border-b border-gray-300">
+      <div class="mb-4 flex justify-between items-center">
+        <button id="backBtn" class="flex items-center text-sm hover:underline">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15m0 0l6.75 6.75M4.5 12l6.75-6.75" />
+          </svg>
+          Back
+        </button>
+      </div>
+      <div>
+        <form id="searchForm" data-subdomain="<%= @origin %>">
+          <div class="relative">
+            <input type="text" id="searchInput" placeholder="Search..." class="focus:ring-0 focus:border-gray-300 focus:outline-none text-sm w-full h-7 border border-gray-300 pl-8 pr-8 py-1 rounded">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 absolute right-2 top-1/2 transform -translate-y-1/2 hidden" id="clearInput">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="searchResults" class="mt-2 pl-4 p-2 pr-4"></div>
+  </div>
+  <a id="visit-dashboard" class="absolute bottom-0 text-xs underline mt-4 hover:text-rose-600" target="_blank" href="https://app.screendesk.io">Visit Dashboard</a>
+  <script>
+    // # Set up
+    var client = ZAFClient.init();
 
-    <script>
-        // # Set up
-        var client = ZAFClient.init();
+    // # Variables
+    let userEmail, customerEmail, capability, ticketId, userKey, accountKey, recordings = {};
 
-        // # Variables
-        let userEmail, customerEmail, capability, ticketId, userKey, accountKey, recordings = {}; 
+    // # Elements
+    const requestBtn = document.getElementById("request-recording");
+    const sendBtn = document.getElementById("send-recording");
+    const recordingsContainer = document.getElementById("recordings-container");
+    const actionsContainer = document.getElementById("actions-container");
+    const liveBtn = document.getElementById("live-session");
+    const previousRecordings = document.getElementById("previous-recordings");
+    const libraryBtn = document.getElementById("libraryBtn");
+    const libraryContainer = document.getElementById("library");
+    const backBtn = document.getElementById("backBtn");
+    const searchInput = document.getElementById('searchInput');
+    const clearInput = document.getElementById('clearInput');
+    const visitBtn = document.getElementById('visit-dashboard');
 
-        // # Elements
-        const requestBtn = document.getElementById("request-recording");
-        const sendBtn = document.getElementById("send-recording");
-        const recordingsContainer = document.getElementById("recordings-container");
-        const actionsContainer = document.getElementById("actions-container");
-        const liveBtn = document.getElementById("live-session");
-        const previousRecordings = document.getElementById("previous-recordings");
+    client.invoke('resize', { width: '200px', height: '250px' })
 
+     searchInput.addEventListener('input', () => {
+    if (searchInput.value) {
+      clearInput.classList.remove('hidden');
+    } else {
+      clearInput.classList.add('hidden');
+    }
+      });
 
-        client.on('app.registered', async function() {
-            capability = await client.get('ticket.editor.capabilities.richText')
-            if (capability['ticket.editor.capabilities.richText'] === false) {
-                client.invoke('resize', { width: '200px', height: '250px' })
-                liveBtn.classList.remove('hidden');
-            } else {
-                client.invoke('resize', { width: '200px', height: '230px' })
-            }
+      clearInput.addEventListener('click', () => {
+    searchInput.value = '';
+    searchInput.focus();
+    clearInput.classList.add('hidden');
+      });
+
+      //   search form
+      const searchForm = document.getElementById("searchForm");
+      const searchResults = document.getElementById("searchResults");
+
+      async function searchLibrary(query, subdomain) {
+      const response = await fetch(`/apps/zendesk/search?query=${encodeURIComponent(query)}&subdomain=${encodeURIComponent(subdomain)}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+      });
+      return await response.json();
+      }
+
+      function displaySearchResults(results) {
+      const resultsContainer = document.getElementById('searchResults');
+      resultsContainer.innerHTML = '';
+
+      if (results.status === 'success') {
+    if (results.recordings.length > 0) {
+      const list = document.createElement('ul');
+      results.recordings.forEach(recording => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('mb-2');
+        listItem.style.display = 'flex';
+        listItem.style.alignItems = 'center';
+        listItem.style.justifyContent = 'space-between';
+
+        const leftContent = document.createElement('div');
+        leftContent.style.display = 'flex';
+        leftContent.style.alignItems = 'center';
+
+        const thumbnail = document.createElement('img');
+        thumbnail.classList.add('w-24', 'h-16', 'mr-2');
+        thumbnail.src = recording.thumbnail_url;
+        thumbnail.style.cursor = 'pointer';
+        thumbnail.addEventListener('click', () => {
+          window.open(recording.thumbnail_url, '_blank');
         });
 
-        async function getUserEmail() {
-            const data = await client.get('currentUser');
-            userEmail = data.currentUser.email;
-            return userEmail;
-        }
+        const textContent = document.createElement('div');
+        textContent.innerHTML = `
+          <h3 class="text-sm text-gray-900 hover:underline"><a class="hover:text-rose-600 truncate" href="https://app.screendesk.io/recordings/${recording.uuid}" target="_blank">${recording.title}</a></h3>
+          <p class="text-xs text-gray-500">Created at: ${recording.created_at}</p>
+        `;
 
-        // it's possible that the customer email is not set
-        async function getTicketDetails() {
-            const data = await client.get('ticket');
-            customerEmail = data['ticket']['requester']['email'];
-            ticketId = data['ticket']['id'];
-            return ticketId;
-        }
+        leftContent.appendChild(thumbnail);
+        leftContent.appendChild(textContent);
 
-        async function getLink(source) {
-            const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/create-link', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    user_key: userKey,
-                    ticket_id: ticketId,
-                    account_key: accountKey,
-                    source: source
-                })
-            })
-           const data = await response.json();
-           if (data.status === "success") {
-               return data.link;
-           }
-        }
+        const insertButton = document.createElement('button');
+        insertButton.classList.add('px-2', 'py-1', 'bg-rose-500', 'text-white', 'rounded', 'text-xs', 'font-medium', 'text-sm', 'hover:brightness-95');
+        insertButton.innerText = 'Share';
+        insertButton.addEventListener('click', (e) => {
+          e.preventDefault();
+        const recordingUrl = `https://app.screendesk.io/recordings/${recording.uuid}`;
 
-        async function getDetailsFromServer() {
-            const ticketId  = await getTicketDetails();
-            const userEmail = await getUserEmail();
-            const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/get-details', {
-                method: 'POST',
-                headers: {
+        client.invoke('ticket.editor.insert', recordingUrl).then( async () => {
+          client.invoke('app.close');
+          client.invoke('notify', 'Video inserted successfully!', 'notice', 5000);
+          client.invoke('ticket.tags.add', 'screendesk-video-shared');
+        }).catch((error) => {
+        console.error('Failed to insert recording URL:', error);
+        });
+        });
+
+        listItem.appendChild(leftContent);
+        listItem.appendChild(insertButton);
+
+        list.appendChild(listItem);
+      });
+      resultsContainer.appendChild(list);
+    } else {
+      const noResultsMessage = document.createElement('p');
+      noResultsMessage.classList.add('text-sm', 'text-gray-500');
+      noResultsMessage.innerText = 'No recordings found for your search query.';
+      resultsContainer.appendChild(noResultsMessage);
+    }
+      } else {
+    const errorMessage = document.createElement('p');
+    errorMessage.classList.add('text-sm', 'text-gray-500');
+    errorMessage.innerText = 'An error occurred while searching. Please try again.';
+    resultsContainer.appendChild(errorMessage);
+      }
+      }
+
+      searchForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const query = searchInput.value;
+      const subdomain = searchForm.dataset.subdomain;
+      const results = await searchLibrary(query, subdomain);
+      displaySearchResults(results);
+      });
+
+      function toggleContainers() {
+      actionsContainer.classList.toggle("hidden");
+      libraryContainer.classList.toggle("hidden");
+      visitBtn.classList.toggle("hidden");
+      }
+
+      libraryBtn.addEventListener("click", async function (e) {
+      e.preventDefault();
+      const results = await searchLibrary('', '<%= @origin %>');
+      displaySearchResults(results);
+      toggleContainers();
+      client.invoke('resize', { width: '320px', height: '500px' })
+      });
+
+      backBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      toggleContainers();
+    client.invoke('resize', { width: '200px', height: '250px' })
+
+      });
+
+    async function getUserEmail() {
+        const data = await client.get('currentUser');
+        userEmail = data.currentUser.email;
+        return userEmail;
+    }
+
+    // it's possible that the customer email is not set
+    async function getTicketDetails() {
+        const data = await client.get('ticket');
+        customerEmail = data['ticket']['requester']['email'];
+        ticketId = data['ticket']['id'];
+        return ticketId;
+    }
+
+    async function getLink(source) {
+        const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/create-link', {
+            method: 'POST',
+            headers: {
                 'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                user_email: userEmail,
-                ticket_id: ticketId,
-                subdomain: '<%= @origin %>',
-                })
-            });
-            const data = await response.json();
-            if (data.status == 'success') {
-                userKey = data.user_key;
-                accountKey = data.account_key;
-                sendBtn.href = `<%= Rails.configuration.variables[:base_url] %>recordings/new?zid=${ticketId}&ak=${data.account_key}&key=${data.user_key}&src=srz`;
-            } else {
-                actionsContainer.innerHTML = `<p class="text-sm text-gray-500">You need to have a Screendesk account in order to use this app.</p>`;
-                previousRecordings.classList.add('hidden');
-            }
-        }
-
-        // Get the recordings
-        async function getRecordings() {
-            const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/get-recordings', {
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+            },
+            body: JSON.stringify({
                 user_key: userKey,
+                ticket_id: ticketId,
                 account_key: accountKey,
-                customer_email: customerEmail,
-                })
-            });
-            const data = await response.json();
-            recordingsContainer.innerHTML = '';
-            if (data.status == 'success') {
-                recordings = data.recordings;
-                if (recordings.length > 0) {
-                    const list = document.createElement('ul');
-                    list.classList.add('list-disc', 'list-inside', 'text-sm');
-                    recordingsContainer.appendChild(list);
-                    const recordingsList = document.getElementsByTagName('ul')[0]; 
-                    recordings.forEach(recording => {
-                        const listItem = document.createElement('li');
-                        listItem.classList.add('text-xs', 'mt-2', 'list-none');
-                        listItem.innerHTML = `<a href="<%= Rails.configuration.variables[:base_url] %>recordings/${recording.uuid}" class="text-gray-500 hover:text-rose-600" target="_blank">${recording.created_at} - ${recording.duration} min</a>`;
-                        recordingsList.appendChild(listItem);
-                    })
-                } else {
-                    recordingsContainer.innerHTML = `<p class="text-sm text-gray-500">No recordings found</p>`;
-         4       }
-            } else {
-                recordingsContainer.innerHTML = ``;
-            }
+                source: source
+            })
+        })
+       const data = await response.json();
+       if (data.status === "success") {
+           return data.link;
+       }
+    }
+
+    async function getDetailsFromServer() {
+        const ticketId  = await getTicketDetails();
+        const userEmail = await getUserEmail();
+        const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/get-details', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+            user_email: userEmail,
+            ticket_id: ticketId,
+            subdomain: '<%= @origin %>',
+            })
+        });
+        const data = await response.json();
+        if (data.status == 'success') {
+            userKey = data.user_key;
+            accountKey = data.account_key;
+            sendBtn.href = `<%= Rails.configuration.variables[:base_url] %>recordings/new?zid=${ticketId}&ak=${data.account_key}&key=${data.user_key}&src=srz`;
+        } else {
+            actionsContainer.innerHTML = `<p class="text-sm text-gray-500">You need to have a Screendesk account in order to use this app.</p>`;
+            previousRecordings.classList.add('hidden');
         }
+    }
 
-        client.on('app.registered', async function() {
-            await getDetailsFromServer();
-            await getRecordings();
+    // Get the recordings
+    async function getRecordings() {
+        const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/get-recordings', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+            user_key: userKey,
+            account_key: accountKey,
+            customer_email: customerEmail,
+            })
+        });
+        const data = await response.json();
+        recordingsContainer.innerHTML = '';
+        if (data.status == 'success') {
+            recordings = data.recordings;
+            if (recordings.length > 0) {
+                const list = document.createElement('ul');
+                list.classList.add('list-disc', 'list-inside', 'text-sm');
+                recordingsContainer.appendChild(list);
+                const recordingsList = document.getElementsByTagName('ul')[0];
+                recordings.forEach(recording => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('text-xs', 'mt-2', 'list-none');
+                    listItem.innerHTML = `<a href="<%= Rails.configuration.variables[:base_url] %>recordings/${recording.uuid}" class="text-gray-500 hover:text-rose-600" target="_blank">${recording.source_type} - ${recording.created_at} - ${recording.duration}</a>`;
+                    recordingsList.appendChild(listItem);
+                })
+            } else {
+                recordingsContainer.innerHTML = `<p class="text-sm text-gray-500">No recordings found</p>`;
+     4       }
+        } else {
+            recordingsContainer.innerHTML = ``;
+        }
+    }
 
-            requestBtn.addEventListener("click", async function(e) {
-                e.preventDefault();
-                const data = await getLink("rrz"); 
-                if (capability['ticket.editor.capabilities.richText'] === true) {
-                    client.invoke('ticket.editor.insert', `<a href="<%= Rails.configuration.variables[:base_url] %>r/${data}">Click here to record your screen</a>`);
-                } else {
-                    client.invoke('ticket.editor.insert', `Click here to record your screen: <%= Rails.configuration.variables[:base_url] %>r/${data}`);
-                }               
-            });
+    client.on('app.registered', async function() {
+        await getDetailsFromServer();
+        await getRecordings();
 
-            liveBtn.addEventListener("click", async function(e) {
-                e.preventDefault();
-                const data = await getLink("lsz"); 
-                client.invoke('ticket.editor.insert', `Join the live session here: <%= Rails.configuration.variables[:base_url] %>r/${data}`);
-            });
+        requestBtn.addEventListener("click", async function(e) {
+            e.preventDefault();
+            const data = await getLink("rrz");
+            const capability = await client.get('ticket.editor.capabilities.richText')
+            if (capability['ticket.editor.capabilities.richText'] === true) {
+                client.invoke('ticket.editor.insert', `<a href="<%= Rails.configuration.variables[:base_url] %>r/${data}">Click here to record your screen</a>`);
+            } else {
+                client.invoke('ticket.editor.insert', `Click here to record your screen: <%=  Rails.configuration.variables[:base_url] %>r/${data}`);
+            }
+            client.invoke('app.close');
         });
 
-        client.on('ticket.updated', async function() {
-            await getRecordings();
+        liveBtn.addEventListener("click", async function(e) {
+            e.preventDefault();
+            const data = await getLink("lsz");
+            client.invoke('ticket.editor.insert', `Join the live session here: <%= Rails.configuration.variables[:base_url] %>r/${data}`);
         });
-    </script>
-<% else %> 
-<div class="text-center">
+    });
+
+    client.on('ticket.updated', async function() {
+        await getRecordings();
+    });
+  </script>
+<% else %>
+  <div class="text-center">
     <p class="elements text-sm mt-2 mx-auto">Sign in to connect your account</p>
     <a id="signin-button" href="<%= @origin %>/oauth/authorizations/new?response_type=code&client_id=zdg-screendesk&redirect_uri=<%= Rails.configuration.variables[:zendesk_redirect_uri]%>&scope=read%20write&state=<%= @origin %>" target="_blank" class="elements text-center border w-1/2 mx-auto p-1 mt-4 block btn-primary outline">Sign in</a>
-</div>
-<p class="elements text-xs mt-2 mx-auto absolute bottom-0 left-0">Get help: support@screendesk.io</p>
+  </div>
+  <p class="elements text-xs mt-2 mx-auto absolute bottom-0 left-0">Get help: support@screendesk.io</p>
+  <script>
+    var client = ZAFClient.init();
 
+    const signinBtn = document.getElementById('signin-button');
+    const body = document.querySelector('body');
+    const elements = document.querySelectorAll('.elements');
 
-    <script>
-        var client = ZAFClient.init();
-
-        const signinBtn = document.getElementById('signin-button');
-        const body = document.querySelector('body');
-        const elements = document.querySelectorAll('.elements');
-
-        signinBtn.addEventListener('click', function(e) {
-            elements.forEach(element => {
-                element.classList.add('hidden');
-            });
-            const p = document.createElement('p');
-            p.classList.add('text-sm', 'mt-2', 'mx-auto');
-            p.textContent = 'Please refresh the page once you have connected your account.';
-            body.append(p);
+    signinBtn.addEventListener('click', function(e) {
+        elements.forEach(element => {
+            element.classList.add('hidden');
         });
-    </script>
+        const p = document.createElement('p');
+        p.classList.add('text-sm', 'mt-2', 'mx-auto');
+        p.textContent = 'Please refresh the page once you have connected your account.';
+        body.append(p);
+    });
+  </script>
 <% end %>
