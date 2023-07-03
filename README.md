@@ -30,9 +30,9 @@ Visit our [Help Desk](https://docs.screendesk.io) or contact support@screendesk.
 
 ### Screenshot(s):
 
-![Screenshot 0](https://res.cloudinary.com/dlpxdgq10/image/upload/v1687946679/klz4835tpripxwy2t5xt.png "Sreenshot 0")
-![Screenshot 1](https://res.cloudinary.com/dlpxdgq10/image/upload/v1687946679/zsizmwjxq5bqbwxot5yc.png "Sreenshot 0")
-![Screenshot 2](https://res.cloudinary.com/dlpxdgq10/image/upload/v1687946679/tjcwso8kvycnohdxv8zs.png "Sreenshot 0")
+![Screenshot 0](https://res.cloudinary.com/dlpxdgq10/image/upload/v1687946679/klz4835tpripxwy2t5xt.png "Screenshot 0")
+![Screenshot 1](https://res.cloudinary.com/dlpxdgq10/image/upload/v1687946679/zsizmwjxq5bqbwxot5yc.png "Screenshot 1")
+![Screenshot 2](https://res.cloudinary.com/dlpxdgq10/image/upload/v1687946679/tjcwso8kvycnohdxv8zs.png "Screenshot 2")
 
 
 
