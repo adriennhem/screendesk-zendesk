@@ -1,7 +1,7 @@
 class ZendeskController < ApplicationController
   skip_before_action :verify_authenticity_token, except: [:connect]
   before_action :zendesk_authenticate_user_with_sign_up!, only: [:connect]
-  before_action :allow_iframe, only: %i[iframe ticket_editor form]
+  before_action :allow_iframe, only: %i[iframe ticket_editor form background]
   before_action :set_locale, only: [:form]
 
   def connect
@@ -52,6 +52,11 @@ class ZendeskController < ApplicationController
   def ticket_editor
     @origin = params[:origin]
     @account_setting = AccountSetting.find_by(zendesk_subdomain: @origin)
+  end
+
+  def background
+    # Background location for toast notifications
+    # No specific data needed as this runs silently
   end
 
   def get_details

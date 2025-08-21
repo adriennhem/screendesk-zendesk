@@ -1,7 +1,7 @@
 {
   "name": "Screendesk",
   "author": {
-    "name": "Screendesk",
+    "name": "Screendesk Team",
     "email": "support@screendesk.io",
     "url": "https://screendesk.io"
   },
@@ -17,6 +17,9 @@
         "url": "https://app.screendesk.io/apps/zendesk/ticket-editor",
         "flexible": true ,
         "autoLoad": true
+      },
+      "background": {
+        "url": "https://app.screendesk.io/apps/zendesk/background"
       }
     }
   },

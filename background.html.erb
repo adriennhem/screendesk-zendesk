@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Screendesk Background App</title>
+  <script src="https://static.zdassets.com/zendesk_app_framework_sdk/2.0/zaf_sdk.min.js"></script>
+</head>
+<body>
+  <script>
+    var client = ZAFClient.init();
+    
+    client.on('app.registered', function() {
+      console.log('Screendesk background app registered and ready');
+    });
+
+    // Listen for activity reminder notifications
+    client.on('api_notification.screendesk_activity_reminder', function(data) {
+      console.log('Background: Received activity reminder:', data);
+      try {
+        const reminderData = typeof data.body === 'string' ? JSON.parse(data.body) : data.body;
+        showActivityReminderNotification(reminderData);
+      } catch (error) {
+        console.error('Error parsing activity reminder data:', error);
+        showActivityReminderNotification();
+      }
+    });
+
+    // Listen for invitation reminder notifications  
+    client.on('api_notification.screendesk_invitation_reminder', function(data) {
+      console.log('Background: Received invitation reminder:', data);
+      try {
+        const invitationData = typeof data.body === 'string' ? JSON.parse(data.body) : data.body;
+        showInvitationReminderNotification(invitationData);
+      } catch (error) {
+        console.error('Error parsing invitation reminder data:', error);
+        showInvitationReminderNotification();
+      }
+    });
+
+    function showActivityReminderNotification(reminderData) {
+      const data = reminderData || {};
+      const totalCount = data.recording_count || 0;
+      const sentCount = data.sent_count || 0;
+      const receivedCount = data.received_count || 0;
+      const daysSinceLastActivity = data.days_since_last_activity || 0;
+      
+      let message;
+      if (totalCount === 0) {
+        message = `
+          <div style="display: flex; align-items: center;">
+            <div style="margin-right: 12px;">📹</div>
+            <div>
+              <strong>Screendesk Available</strong><br>
+              <span style="font-size: 13px;">Request screen recordings from customers to resolve technical issues faster. Access the Screendesk app through your sidebar or ticket editor.</span>
+            </div>
+          </div>
+        `;
+      } else if (daysSinceLastActivity > 14) {
+        let activityText = '';
+        if (sentCount > 0 && receivedCount > 0) {
+          activityText = `You've processed ${totalCount} recordings (${sentCount} sent, ${receivedCount} received).`;
+        } else if (sentCount > 0) {
+          activityText = `You've sent ${sentCount} recording${sentCount !== 1 ? 's' : ''}.`;
+        } else if (receivedCount > 0) {
+          activityText = `You've received ${receivedCount} recording${receivedCount !== 1 ? 's' : ''}.`;
+        }
+        
+        message = `
+          <div style="display: flex; align-items: center;">
+            <div style="margin-right: 12px;">📹</div>
+            <div>
+              <strong>Screendesk Activity Summary</strong><br>
+              <span style="font-size: 13px;">${activityText} Continue using the Screendesk app in your sidebar or ticket editor to resolve tickets faster.</span>
+            </div>
+          </div>
+        `;
+      } else {
+        message = `
+          <div style="display: flex; align-items: center;">
+            <div style="margin-right: 12px;">📹</div>
+            <div>
+              <strong>Screendesk Ready</strong><br>
+              <span style="font-size: 13px;">Request screen recordings from customers to resolve technical issues faster. Use the Screendesk app in your sidebar or ticket editor.</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      client.invoke('notify', message, 'notice', 8000);
+    }
+
+    function showInvitationReminderNotification(invitationData) {
+      const data = invitationData || {};
+      const invitationUrl = data.invitation_url || '#';
+      const accountName = data.account_name || 'your team';
+      
+      let message = `
+        <div style="display: flex; align-items: center;">
+          <div style="margin-right: 12px;">✉️</div>
+          <div>
+            <strong>Screendesk Invitation</strong><br>
+            <span style="font-size: 13px;">You've been invited to join ${accountName} on Screendesk.</span><br>
+            <a href="${invitationUrl}" target="_blank" style="color: #f43f5e; text-decoration: none; font-size: 13px; font-weight: 500;">Click here to accept your invitation →</a>
+          </div>
+        </div>
+      `;
+      
+      client.invoke('notify', message, 'notice', 12000);
+    }
+
+    console.log('Screendesk background app initialized and listening for notifications');
+  </script>
+</body>
+</html>
