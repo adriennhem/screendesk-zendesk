@@ -1,43 +1,39 @@
 # App name
 
-Screendesk is the all-in-one video solution trusted by customer facing teams at startups and enterprises worldwide. 
-
-### The following information is displayed:
+**Trusted by over 1,000 customer-facing teams** at startups and enterprises worldwide, Screendesk is a video support tool designed to resolve issues faster, reduce back-and-forth, and enhance customer satisfaction—without leaving Zendesk. ⚡ **No downloads required**—customers and agents can record screens or start video calls with just a link.
 
 ## SCREEN RECORDING
 
-* **Request screen recordings from your customers**: instead of making users explain an issue via text or live call, give them the option to record their screens. 
-* Send how-to videos to your customers: make it easy for customers to understand a product or concept using video to share information and demonstrate next steps.
-* Collect browser metadata & Console logs: recordings also come with console logs and additional metadata such as operating system, hardware, and browser details. 
-* Automatically receive the recorded videos: recorded videos will be added as new reply in your tickets. 
-* No download or installs: works on any desktop browser. Your customers simply click on the link and start recording. 
-* Search and reply with existing videos in your helpdesk.
-* AI Video summaries: transcribe and summarize screen recordings with AI to help your team triage issues faster.
+* **Request screen recordings from customers** – Let customers show the issue instead of explaining in text.
+* **Send how-to videos** – Personalize with your camera for more human interactions.
+* **Collect browser metadata, console logs & network information** – Get crucial system details automatically with recordings.
+* **AI Solver** – Analyze ticket details, system information, and documentation to resolve tickets faster.
+* **Videos automatically attached to tickets** – No manual work—recordings appear as ticket replies.
+* **Search & reuse past videos** – Easily access previous recordings in Zendesk.
+* **AI video summaries** – Quickly triage and resolve tickets with transcriptions and summaries.
 
-## LIVE SCREEN SHARING
+## LIVE SCREEN SHARING & VIDEO CALLS
 
-* **Real-time screen sharing with with your customers**: support agents can use screen sharing on video calls to walk customers through solutions.
-* Record your video calls: train new support agents by sharing recordings of your video calls.
-* No downloads required: Jump on a video call with your customers without requiring them or your agents to download anything.
+* **Start video calls from Zendesk** – Support agents can jump on live calls without switching tools.
+* **Record & reuse video calls** – Create a library of recorded calls for QA matters and escalate issues internally for faster resolution.
+* **No downloads required** – Join calls instantly via browser.
 
-## POWERFUL EMBEDS
+## ZENDESK INTEGRATION
 
-* **Collect screen recordings directly from your submit request page.**
-* **Embed videos in your help center**: Say goodbye to long, boring help articles. Embed videos in your help center to make it easier for customers to help themselves.
-* Call-to-action buttons: Add links to help articles and other resources from within your video.
+* **Action buttons inside Zendesk** – Request recordings, start video calls, send recordings, and access past videos directly from Zendesk.
+* **Connected to Zendesk forms** – Let customers record their screens when submitting requests, linking recordings automatically to tickets.
+* **Tags for reporting** – Use tags for insights and analysis in Zendesk Explore.
+
+## SECURITY & COMPLIANCE
+
+* GDPR & CCPA compliant
+* Restricted recording access
+* Automatic data deletion
+* Sensitive data masking
+* **SAML SSO**
+
+📡 **Chrome Extension** – Unlock advanced features like instant screen recording and annotations directly from your browser.
+
+🔥 **Resolve issues faster and improve customer satisfaction—all without leaving Zendesk.**
 
 Visit our [Help Desk](https://docs.screendesk.io) or contact support@screendesk.io for support. 
-
-### Screenshot(s):
-
-![Screenshot 0](https://res.cloudinary.com/dlpxdgq10/image/upload/v1687946679/klz4835tpripxwy2t5xt.png "Screenshot 0")
-![Screenshot 1](https://res.cloudinary.com/dlpxdgq10/image/upload/v1687946679/zsizmwjxq5bqbwxot5yc.png "Screenshot 1")
-![Screenshot 2](https://res.cloudinary.com/dlpxdgq10/image/upload/v1687946679/tjcwso8kvycnohdxv8zs.png "Screenshot 2")
-
-
-
-
-
-
-
-

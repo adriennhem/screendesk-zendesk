@@ -53,6 +53,7 @@
     <h3 id="previous-recordings" class="text-sm mb-1 mt-3 font-medium">Previous Recordings</h3>
     <div id="recordings-container" class="mb-2">
     </div>
+    <a id="visit-dashboard" class="text-xs underline mt-4 hover:text-rose-600" target="_blank" href="https://app.screendesk.io">Visit Dashboard</a>
   </div>
   <div id="library" class="hidden text-left">
     <div class="mt-3 mb-4 pl-4 pb-4 pr-4 border-b border-gray-300">
@@ -67,7 +68,7 @@
       <div>
         <form id="searchForm" data-subdomain="<%= @origin %>">
           <div class="relative">
-            <input type="text" id="searchInput" placeholder="Search..." class="focus:ring-0 focus:border-gray-300 focus:outline-none text-sm w-full h-7 border border-gray-300 pl-8 pr-8 py-1 rounded">
+            <input type="text" id="searchInput" placeholder="Type video title or #tags to search..." class="focus:ring-0 focus:border-gray-300 focus:outline-none text-sm w-full h-7 border border-gray-300 pl-8 pr-8 py-1 rounded">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
@@ -80,7 +81,6 @@
     </div>
     <div id="searchResults" class="mt-2 pl-4 p-2 pr-4"></div>
   </div>
-  <a id="visit-dashboard" class="absolute bottom-0 text-xs underline mt-4 hover:text-rose-600" target="_blank" href="https://app.screendesk.io">Visit Dashboard</a>
   <script>
     // # Set up
     var client = ZAFClient.init();
@@ -101,6 +101,10 @@
     const searchInput = document.getElementById('searchInput');
     const clearInput = document.getElementById('clearInput');
     const visitBtn = document.getElementById('visit-dashboard');
+    var zendeskLiveText = "<%= j @account_setting.zendesk_live_text %>";
+    var zendeskRequestRecordingText = "<%= j @account_setting.zendesk_request_recording_text %>";
+    var zendeskChatRequestRecordingText = "<%= j @account_setting.zendesk_chat_request_recording_text %>";
+    var baseUrl = "<%= j Rails.configuration.variables[:base_url] %>";
 
     client.invoke('resize', { width: '200px', height: '250px' })
 
@@ -123,7 +127,7 @@
       const searchResults = document.getElementById("searchResults");
 
       async function searchLibrary(query, subdomain) {
-      const response = await fetch(`/apps/zendesk/search?query=${encodeURIComponent(query)}&subdomain=${encodeURIComponent(subdomain)}`, {
+      const response = await fetch(`/apps/zendesk/search?query=${encodeURIComponent(query)}&subdomain=${encodeURIComponent(subdomain)}&email=${encodeURIComponent(userEmail)}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -132,76 +136,79 @@
       return await response.json();
       }
 
-      function displaySearchResults(results) {
-      const resultsContainer = document.getElementById('searchResults');
-      resultsContainer.innerHTML = '';
+    function displaySearchResults(results) {
+    const resultsContainer = document.getElementById('searchResults');
+    resultsContainer.innerHTML = '';
 
-      if (results.status === 'success') {
-    if (results.recordings.length > 0) {
-      const list = document.createElement('ul');
-      results.recordings.forEach(recording => {
-        const listItem = document.createElement('li');
-        listItem.classList.add('mb-2');
-        listItem.style.display = 'flex';
-        listItem.style.alignItems = 'center';
-        listItem.style.justifyContent = 'space-between';
+    if (results.status === 'success') {
+        if (results.recordings.length > 0) {
+            const list = document.createElement('ul');
+            list.classList.add('list-none', 'p-0');
+            results.recordings.forEach(recording => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('mb-2', 'flex', 'items-center', 'justify-between', 'border-b', 'pb-2', 'mb-4');
 
-        const leftContent = document.createElement('div');
-        leftContent.style.display = 'flex';
-        leftContent.style.alignItems = 'center';
+                const leftContent = document.createElement('div');
+                leftContent.classList.add('flex', 'items-center', 'flex-1', 'overflow-hidden');
 
-        const thumbnail = document.createElement('img');
-        thumbnail.classList.add('w-24', 'h-16', 'mr-2');
-        thumbnail.src = recording.thumbnail_url;
-        thumbnail.style.cursor = 'pointer';
-        thumbnail.addEventListener('click', () => {
-          window.open(recording.thumbnail_url, '_blank');
-        });
+                const thumbnail = document.createElement('img');
+                thumbnail.classList.add('w-24', 'h-16', 'mr-2', 'cursor-pointer');
+                thumbnail.src = recording.thumbnail_url;
+                thumbnail.addEventListener('click', () => {
+                    window.open(recording.thumbnail_url, '_blank');
+                });
 
-        const textContent = document.createElement('div');
-        textContent.innerHTML = `
-          <h3 class="text-sm text-gray-900 hover:underline"><a class="hover:text-rose-600 truncate" href="https://app.screendesk.io/recordings/${recording.uuid}" target="_blank">${recording.title}</a></h3>
-          <p class="text-xs text-gray-500">Created at: ${recording.created_at}</p>
-        `;
+                const textContent = document.createElement('div');
+                textContent.classList.add('flex-1', 'overflow-hidden');
+                textContent.innerHTML = `
+                    <h3 class="text-sm text-gray-900 hover:underline whitespace-nowrap overflow-hidden overflow-ellipsis">
+                        <a class="hover:text-rose-600" href="https://app.screendesk.io/recordings/${recording.uuid}" target="_blank">
+                            ${recording.title}
+                        </a>
+                    </h3>
+                    <p class="text-xs text-gray-500 whitespace-nowrap">Created at: ${recording.created_at}</p>
+                `;
 
-        leftContent.appendChild(thumbnail);
-        leftContent.appendChild(textContent);
+                leftContent.appendChild(thumbnail);
+                leftContent.appendChild(textContent);
 
-        const insertButton = document.createElement('button');
-        insertButton.classList.add('px-2', 'py-1', 'bg-rose-500', 'text-white', 'rounded', 'text-xs', 'font-medium', 'text-sm', 'hover:brightness-95');
-        insertButton.innerText = 'Share';
-        insertButton.addEventListener('click', (e) => {
-          e.preventDefault();
-        const recordingUrl = `https://app.screendesk.io/recordings/${recording.uuid}`;
+                const insertButton = document.createElement('button');
+                insertButton.classList.add('px-2', 'py-1', 'bg-rose-500', 'text-white', 'rounded', 'text-xs', 'font-medium', 'hover:brightness-95', 'ml-2');
+                insertButton.innerText = 'Share';
+                insertButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const recordingUrl = `https://app.screendesk.io/recordings/${recording.uuid}`;
 
-        client.invoke('ticket.editor.insert', recordingUrl).then( async () => {
-          client.invoke('app.close');
-          client.invoke('notify', 'Video inserted successfully!', 'notice', 5000);
-          client.invoke('ticket.tags.add', 'screendesk-video-shared');
-        }).catch((error) => {
-        console.error('Failed to insert recording URL:', error);
-        });
-        });
+                    client.invoke('ticket.editor.insert', recordingUrl).then(async () => {
+                        client.invoke('app.close');
+                        client.invoke('notify', 'Video inserted successfully!', 'notice', 5000);
+                        client.invoke('ticket.tags.add', 'screendesk-video-shared');
+                    }).catch((error) => {
+                        console.error('Failed to insert recording URL:', error);
+                    });
+                });
 
-        listItem.appendChild(leftContent);
-        listItem.appendChild(insertButton);
+                listItem.appendChild(leftContent);
+                listItem.appendChild(insertButton);
 
-        list.appendChild(listItem);
-      });
-      resultsContainer.appendChild(list);
+                list.appendChild(listItem);
+            });
+            resultsContainer.appendChild(list);
+        } else {
+            const noResultsMessage = document.createElement('p');
+            noResultsMessage.classList.add('text-sm', 'text-gray-500');
+            noResultsMessage.innerText = 'No recordings found for your search query.';
+            resultsContainer.appendChild(noResultsMessage);
+        }
     } else {
-      const noResultsMessage = document.createElement('p');
-      noResultsMessage.classList.add('text-sm', 'text-gray-500');
-      noResultsMessage.innerText = 'No recordings found for your search query.';
-      resultsContainer.appendChild(noResultsMessage);
+        const errorMessage = document.createElement('p');
+        errorMessage.classList.add('text-sm', 'text-gray-500');
+        errorMessage.innerText = 'An error occurred while searching. Please try again.';
+        resultsContainer.appendChild(errorMessage);
     }
-      } else {
-    const errorMessage = document.createElement('p');
-    errorMessage.classList.add('text-sm', 'text-gray-500');
-    errorMessage.innerText = 'An error occurred while searching. Please try again.';
-    resultsContainer.appendChild(errorMessage);
-      }
-      }
+    }
+
+
 
       searchForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -285,7 +292,29 @@
             accountKey = data.account_key;
             sendBtn.href = `<%= Rails.configuration.variables[:base_url] %>recordings/new?zid=${ticketId}&ak=${data.account_key}&key=${data.user_key}&src=srz`;
         } else {
-            actionsContainer.innerHTML = `<p class="text-sm text-gray-500">You need to have a Screendesk account in order to use this app.</p>`;
+            switch (response.status) {
+                case 404:
+                    actionsContainer.innerHTML = `
+                        <div class="text-center mx-auto">
+                            <p class="text-sm text-gray-500">Account not found</p>
+                            <a id="signin-button" href="<%= @origin %>/oauth/authorizations/new?response_type=code&client_id=zdg-screendesk&redirect_uri=<%= Rails.configuration.variables[:base_url] %>apps/zendesk/connect&scope=read%20write&state=<%= @origin %>" target="_blank" class="inline-block border w-1/2 p-1 mt-4 btn-primary outline">Sign in</a>
+                        </div>`;
+                    break;
+
+                case 401:
+                    actionsContainer.innerHTML = `
+                            <p class="text-sm text-gray-500">${data.error}</p>`;
+                    break;
+
+                case 403:
+                    actionsContainer.innerHTML = `
+                            <p class="text-sm text-gray-500">${data.error}</p>`;
+                    break;
+
+                default:
+                    actionsContainer.innerHTML = `
+                            <p class="text-sm text-gray-500">An unexpected error occurred. Please try again later.</p>`;
+            }
             previousRecordings.classList.add('hidden');
         }
     }
@@ -301,6 +330,7 @@
             user_key: userKey,
             account_key: accountKey,
             customer_email: customerEmail,
+            ticket_id: ticketId,
             })
         });
         const data = await response.json();
@@ -327,27 +357,47 @@
     }
 
     client.on('app.registered', async function() {
-        await getDetailsFromServer();
-        await getRecordings();
+      await getDetailsFromServer();
+      await getRecordings();
 
-        requestBtn.addEventListener("click", async function(e) {
-            e.preventDefault();
-            const data = await getLink("rrz");
-            const capability = await client.get('ticket.editor.capabilities.richText')
-            if (capability['ticket.editor.capabilities.richText'] === true) {
-                client.invoke('ticket.editor.insert', `<a href="<%= Rails.configuration.variables[:base_url] %>r/${data}">Click here to record your screen</a>`);
-            } else {
-                client.invoke('ticket.editor.insert', `Click here to record your screen: <%=  Rails.configuration.variables[:base_url] %>r/${data}`);
-            }
-            client.invoke('app.close');
-        });
+      requestBtn.addEventListener("click", async function(e) {
+          e.preventDefault();
+          const data = await getLink("rrz");
+          const capability = await client.get('ticket.editor.capabilities.richText');
+          const link = `${baseUrl}r/${data}`;
+          let textToInsert;
 
-        liveBtn.addEventListener("click", async function(e) {
-            e.preventDefault();
-            const data = await getLink("lsz");
-            client.invoke('ticket.editor.insert', `Join the live session here: <%= Rails.configuration.variables[:base_url] %>r/${data}`);
-        });
+          if (capability['ticket.editor.capabilities.richText'] === true) {
+              textToInsert = replaceLinkWithCustomText(zendeskRequestRecordingText, link);
+          } else {
+              textToInsert = replaceLinkPlaceholder(zendeskChatRequestRecordingText, link);
+          }
+          client.invoke('ticket.editor.insert', textToInsert);
+          client.invoke('app.close');
+      });
+
+      liveBtn.addEventListener("click", async function(e) {
+          e.preventDefault();
+          const data = await getLink("lsz");
+          const link = `${baseUrl}r/${data}`;
+          client.invoke('ticket.editor.insert', replaceLinkPlaceholder(zendeskLiveText, link));
+      });
     });
+
+    function replaceLinkPlaceholder(text, link) {
+      return text.replace(/{{link}}/g, link);
+    }
+
+    function replaceLinkWithCustomText(text, link) {
+      // Replace {{...}} with an anchor tag containing the custom text
+      const customTextRegex = /{{(.*?)}}/g;
+      text = text.replace(customTextRegex, (match, p1) => `<a href="${link}">${p1}</a>`);
+
+      // Replace {{link}} with just the link URL
+      text = text.replace(/{{link}}/g, link);
+
+      return text;
+    }
 
     client.on('ticket.updated', async function() {
         await getRecordings();

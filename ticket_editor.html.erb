@@ -326,7 +326,7 @@
           if (capability['ticket.editor.capabilities.richText'] === true) {
               client.invoke('ticket.editor.insert', `<a href="<%= Rails.configuration.variables[:base_url] %>r/${data}">Click here to record your screen</a>`);
           } else {
-              client.invoke('ticket.editor.insert', `Click here to record your screen: <%= Rails.configuration.variables[:base_url] %>r/${data}`);
+              client.invoke('ticket.editor.insert', ` to record your screen: <%= Rails.configuration.variables[:base_url] %>r/${data}`);
           }
           client.invoke('app.close');
       });

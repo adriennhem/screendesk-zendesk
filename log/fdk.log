@@ -18,3 +18,60 @@ Require stack:
 2023-03-03 09:10:03.432 +0100 [debug] ([34mlogger.js[0m) [31mStarting FDK in node v15.14.0 on darwin[0m
 2023-03-03 09:10:03.432 +0100 [debug] ([34msequelize.js[0m) [31msetting up sqilite at "/Users/adriennhem/Sites/screendesk-zendesk/.fdk/store.sqlite"[0m
 2023-03-03 09:10:03.432 +0100 [error] [31m[ERROR][0m  Node.js version of 18.x.x is required to run this SDK. v15.14.0 found.
+2024-11-19 21:20:39.747 +0000 [debug] ([34mconfigs.js[0m) [31mloaded default configs as "{"updates":{"manifest_url":"https://cdn.freshdev.io/assets/fdk/updates.json","period":24},"log":{"level":"info"},"javascript":{"ecma_version":2020},"request":{"timeout":15000},"global_apps":{"enabled":false},"easel":{"enabled":false}}"[0m
+2024-11-19 21:20:39.748 +0000 [debug] ([34mfile.js[0m) [31mError while requiring /Users/adriennhem/.fdk/configs.json: Cannot find module '/Users/adriennhem/.fdk/configs.json'
+Require stack:
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/lib/utils/file.js
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/lib/configs.js
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/lib/logger.js
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/index.js[0m
+2024-11-19 21:20:39.748 +0000 [debug] ([34mconfigs.js[0m) [31mloaded global configs as "{}"[0m
+2024-11-19 21:20:39.749 +0000 [debug] ([34mfile.js[0m) [31mError while requiring /Users/adriennhem/Sites/screendesk-zendesk/.fdk/configs.json: Cannot find module '/Users/adriennhem/Sites/screendesk-zendesk/.fdk/configs.json'
+Require stack:
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/lib/utils/file.js
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/lib/configs.js
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/lib/logger.js
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/index.js[0m
+2024-11-19 21:20:39.749 +0000 [debug] ([34mfile.js[0m) [31mError while requiring /Users/adriennhem/Sites/screendesk-zendesk/.fdk/configs.json: Cannot find module '/Users/adriennhem/Sites/screendesk-zendesk/.fdk/configs.json'
+Require stack:
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/lib/utils/file.js
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/lib/configs.js
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/lib/logger.js
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/index.js[0m
+2024-11-19 21:20:39.749 +0000 [debug] ([34mconfigs.js[0m) [31mloaded local configs as "{}"[0m
+2024-11-19 21:20:39.749 +0000 [debug] ([34mconfigs.js[0m) [31mloaded env configs as "{"updates":{},"log":{},"javascript":{},"request":{"timeout":15000}}"[0m
+2024-11-19 21:20:39.749 +0000 [debug] ([34mconfigs.js[0m) [31mloaded resolved configs as "{"updates":{"manifest_url":"https://cdn.freshdev.io/assets/fdk/updates.json","period":24},"log":{"level":"info"},"javascript":{"ecma_version":2020},"request":{"timeout":15000},"global_apps":{"enabled":false},"easel":{"enabled":false}}"[0m
+2024-11-19 21:20:39.749 +0000 [debug] ([34mlogger.js[0m) [31mStarting FDK in node v18.14.2 on darwin[0m
+2024-11-19 21:20:39.749 +0000 [debug] ([34msequelize.js[0m) [31msetting up sqilite at "/Users/adriennhem/Sites/screendesk-zendesk/.fdk/store.sqlite"[0m
+2024-11-19 21:20:39.749 +0000 [debug] ([34mdata.js[0m) [31mRead {"version_details":{"cli":{"deprecated":{"version":"<9","message":"This FDK version has been deprecated. There will be no further feature updates to this version. For a seamless app-building experience, ensure to move to the latest FDK version. For more information, see https://developers.freshworks.com/docs/app-sdk/v2.3/freshdesk/migration-guide/#migrate-to-the-latest-platform-version."},"forced":{"version":"7.0.0","command":"npm install https://dl.freshdev.io/cli/fdk-7.0.0.tgz -g","message":"Your FDK version has been forced updated to v7.0.0, please visit https://community.developers.freshworks.com/t/fdk-v7-0-announcing-node-js-v12-and-es6-support/3606 to know more"},"latest":{"version":"9.2.1","command":"npm install https://cdn.freshdev.io/fdk/latest.tgz -g","message":"You are on the latest FDK version. For information on the features available as part of this FDK version, see https://developers.freshworks.com/docs/?tab=modules."}},"addon":{"version":"2.0.7","url":"https://cdn.freshdev.io/assets/fdk/addons/addon.zip"}},"last_updated":{"time_stamp":1732026151577}}[0m
+2024-11-19 21:20:39.750 +0000 [debug] ([34mupdater.js[0m) [31mlast check less than 24 hours ago, not looking for updates[0m
+2024-11-19 21:20:39.752 +0000 [debug] ([34mindex.js[0m) [31mrunning with opts {}[0m
+2024-11-19 21:20:39.766 +0000 [debug] ([34mdata.js[0m) [31mRead {"version_details":{"cli":{"deprecated":{"version":"<9","message":"This FDK version has been deprecated. There will be no further feature updates to this version. For a seamless app-building experience, ensure to move to the latest FDK version. For more information, see https://developers.freshworks.com/docs/app-sdk/v2.3/freshdesk/migration-guide/#migrate-to-the-latest-platform-version."},"forced":{"version":"7.0.0","command":"npm install https://dl.freshdev.io/cli/fdk-7.0.0.tgz -g","message":"Your FDK version has been forced updated to v7.0.0, please visit https://community.developers.freshworks.com/t/fdk-v7-0-announcing-node-js-v12-and-es6-support/3606 to know more"},"latest":{"version":"9.2.1","command":"npm install https://cdn.freshdev.io/fdk/latest.tgz -g","message":"You are on the latest FDK version. For information on the features available as part of this FDK version, see https://developers.freshworks.com/docs/?tab=modules."}},"addon":{"version":"2.0.7","url":"https://cdn.freshdev.io/assets/fdk/addons/addon.zip"}},"last_updated":{"time_stamp":1732026151577}}[0m
+2024-11-19 21:20:39.768 +0000 [debug] ([34mmanifest.js[0m) [31mReloading manifest with {"name":"Screendesk","author":{"name":"Screendesk","email":"support@screendesk.io","url":"https://screendesk.io"},"defaultLocale":"en","private":false,"location":{"support":{"ticket_sidebar":{"url":"http://localhost:3000/apps/zendesk/iframe","flexible":true},"ticket_editor":{"url":"http://localhost:3000/apps/zendesk/ticket-editor","flexible":true,"autoLoad":true}}},"version":"2.0.0","frameworkVersion":"2.0"}.[0m
+2024-11-19 21:20:39.768 +0000 [debug] ([34mmanifest.js[0m) [31mInferred db as features.[0m
+2024-11-19 21:20:39.768 +0000 [debug] ([34mdata.js[0m) [31mRead {"version_details":{"cli":{"deprecated":{"version":"<9","message":"This FDK version has been deprecated. There will be no further feature updates to this version. For a seamless app-building experience, ensure to move to the latest FDK version. For more information, see https://developers.freshworks.com/docs/app-sdk/v2.3/freshdesk/migration-guide/#migrate-to-the-latest-platform-version."},"forced":{"version":"7.0.0","command":"npm install https://dl.freshdev.io/cli/fdk-7.0.0.tgz -g","message":"Your FDK version has been forced updated to v7.0.0, please visit https://community.developers.freshworks.com/t/fdk-v7-0-announcing-node-js-v12-and-es6-support/3606 to know more"},"latest":{"version":"9.2.1","command":"npm install https://cdn.freshdev.io/fdk/latest.tgz -g","message":"You are on the latest FDK version. For information on the features available as part of this FDK version, see https://developers.freshworks.com/docs/?tab=modules."}},"addon":{"version":"2.0.7","url":"https://cdn.freshdev.io/assets/fdk/addons/addon.zip"}},"last_updated":{"time_stamp":1732026151577}}[0m
+2024-11-19 21:20:39.974 +0000 [debug] ([34mfile.js[0m) [31mError while requiring /Users/adriennhem/Sites/screendesk-zendesk/.report.json: Cannot find module '/Users/adriennhem/Sites/screendesk-zendesk/.report.json'
+Require stack:
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/lib/utils/file.js
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/lib/configs.js
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/lib/logger.js
+- /Users/adriennhem/.nvm/versions/node/v18.14.2/lib/node_modules/fdk/index.js[0m
+2024-11-19 21:20:40.953 +0000 [debug] ([34mvalidate.js[0m) [31masked to skip the following validations, [0m
+2024-11-19 21:20:40.953 +0000 [debug] ([34mvalidate.js[0m) [31mrunning validator actions[0m
+2024-11-19 21:20:40.953 +0000 [debug] ([34mvalidate.js[0m) [31mrunning validator requests[0m
+2024-11-19 21:20:40.953 +0000 [debug] ([34mvalidate.js[0m) [31mrunning validator app-dir[0m
+2024-11-19 21:20:40.953 +0000 [debug] ([34mvalidate.js[0m) [31mrunning validator config-dir[0m
+2024-11-19 21:20:40.953 +0000 [debug] ([34mconfig-dir.js[0m) [31mChecking to see if /Users/adriennhem/Sites/screendesk-zendesk/config/ exists.[0m
+2024-11-19 21:20:40.953 +0000 [debug] ([34mvalidate.js[0m) [31mrunning validator custom-objects[0m
+2024-11-19 21:20:40.954 +0000 [debug] ([34mvalidate.js[0m) [31mrunning validator event[0m
+2024-11-19 21:20:40.954 +0000 [debug] ([34mvalidate.js[0m) [31mrunning validator iparam[0m
+2024-11-19 21:20:40.954 +0000 [debug] ([34mvalidate.js[0m) [31mrunning validator lint[0m
+2024-11-19 21:20:40.954 +0000 [debug] ([34mlint.js[0m) [31mpassed fix flag: undefined[0m
+2024-11-19 21:20:40.955 +0000 [debug] ([34mvalidate.js[0m) [31mrunning validator manifest[0m
+2024-11-19 21:20:40.955 +0000 [debug] ([34mvalidate.js[0m) [31mrunning validator manifest-dependency[0m
+2024-11-19 21:20:40.955 +0000 [debug] ([34mvalidate.js[0m) [31mrunning validator oauth[0m
+2024-11-19 21:20:40.956 +0000 [debug] ([34mvalidate.js[0m) [31mskipping validator pkgsize[0m
+2024-11-19 21:20:40.956 +0000 [debug] ([34mvalidate.js[0m) [31mskipping validator schema[0m
+2024-11-19 21:20:40.956 +0000 [debug] ([34mvalidate.js[0m) [31mrunning validator version-check[0m
+2024-11-19 21:20:40.956 +0000 [warn] [33m[WARN][0m App was developed in Node.js runtime 10 or below, and is currently being executed in v18.14.2
+2024-11-19 21:20:40.963 +0000 [debug] ([34mvalidate.js[0m) [31mrunning validator app-settings[0m
