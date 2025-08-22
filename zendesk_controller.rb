@@ -1,7 +1,8 @@
 class ZendeskController < ApplicationController
   skip_before_action :verify_authenticity_token, except: [:connect]
   before_action :zendesk_authenticate_user_with_sign_up!, only: [:connect]
-  before_action :allow_iframe, only: %i[iframe ticket_editor form background]
+  before_action :log_integration_request!, except: [:connect, :disconnect, :iframe, :ticket_editor, :form]
+  before_action :allow_iframe, only: %i[iframe ticket_editor form]
   before_action :set_locale, only: [:form]
 
   def connect
@@ -55,8 +56,9 @@ class ZendeskController < ApplicationController
   end
 
   def background
-    # Background location for toast notifications
-    # No specific data needed as this runs silently
+    # Background app runs without user authentication
+    # It only listens for notifications and displays toast messages
+    render layout: false
   end
 
   def get_details
@@ -111,6 +113,11 @@ class ZendeskController < ApplicationController
                 config.url = url
                 config.access_token = account.account_setting.zendesk_access_token
                 config.retry = true
+
+                # Add required Zendesk Marketplace headers
+                config.client_options = {
+                  headers: ZendeskClient.marketplace_headers
+                }
               end
 
               ticket = client.tickets.find(id: params[:ticket_id])
@@ -146,6 +153,10 @@ class ZendeskController < ApplicationController
       end
 
       if link&.save
+        # Track Zendesk activity for bi-monthly notifications
+        user_setting = user.user_setting || user.create_user_setting
+        user_setting.update(zendesk_last_activity_at: Time.current)
+
         render json: { status: "success", link: link.slug }
       else
         render json: { error: "Something went wrong. Please try again." }, status: 500
@@ -259,5 +270,17 @@ class ZendeskController < ApplicationController
        properties: properties,
        groups: groups
     })
+  end
+
+  private
+
+  def log_integration_request!
+    Rails.logger.info("ZENDESK: #{action_name} - #{request.method} #{request.url}")
+
+    # Check for potential ad blocker indicators
+    user_agent = request.user_agent.to_s.downcase
+    if user_agent.include?('ublock') || user_agent.include?('adblock') || user_agent.include?('ghostery')
+      Rails.logger.warn("POTENTIAL AD BLOCKER DETECTED: #{request.user_agent}")
+    end
   end
 end
