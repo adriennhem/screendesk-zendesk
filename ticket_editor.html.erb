@@ -66,7 +66,7 @@
     <div>
       <form id="searchForm" data-subdomain="<%= @origin %>">
         <div class="relative">
-          <input type="text" id="searchInput" placeholder="Search..." class="focus:ring-0 focus:border-gray-300 focus:outline-none text-sm w-full h-7 border border-gray-300 pl-8 pr-8 py-1 rounded">
+          <input type="text" id="searchInput" placeholder="Type video title or #tags to search..." class="focus:ring-0 focus:border-gray-300 focus:outline-none text-sm w-full h-7 border border-gray-300 pl-8 pr-8 py-1 rounded">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
           </svg>
@@ -87,6 +87,8 @@
   // Variables
   let userEmail, capability, customerEmail, ticketId, userKey, accountKey, recordings = {};
 
+
+
   // client.on('pane.activated', async function() {
   //     capability = await client.get('ticket.editor.capabilities.richText')
   //     if (capability['ticket.editor.capabilities.richText'] === false) {
@@ -106,6 +108,10 @@
   const backBtn = document.getElementById("backBtn");
   const searchInput = document.getElementById('searchInput');
   const clearInput = document.getElementById('clearInput');
+  var zendeskLiveText = "<%= j @account_setting&.zendesk_live_text || 'Join live session here: {{link}}' %>";
+  var zendeskRequestRecordingText = "<%= j @account_setting&.zendesk_request_recording_text || '{{Click here to record your screen}}' %>";
+  var zendeskChatRequestRecordingText = "<%= j @account_setting&.zendesk_chat_request_recording_text || 'Click here to record your screen: {{link}}' %>";
+  var baseUrl = "<%= j Rails.configuration.variables[:base_url] %>";
 
   searchInput.addEventListener('input', () => {
     if (searchInput.value) {
@@ -126,10 +132,10 @@
   const searchResults = document.getElementById("searchResults");
 
   async function searchLibrary(query, subdomain) {
-  const response = await fetch(`/apps/zendesk/search?query=${encodeURIComponent(query)}&subdomain=${encodeURIComponent(subdomain)}`, {
+  const response = await fetch(`/apps/zendesk/search?query=${encodeURIComponent(query)}&subdomain=${encodeURIComponent(subdomain)}&email=${encodeURIComponent(userEmail)}`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
   });
   return await response.json();
@@ -251,7 +257,7 @@
       const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/create-link', {
           method: 'POST',
           headers: {
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/json'
           },
           body: JSON.stringify({
               user_key: userKey,
@@ -272,77 +278,103 @@
       const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/get-details', {
           method: 'POST',
           headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
           },
           body: JSON.stringify({
           user_email: userEmail,
           customer_email: customerEmail,
           ticket_id: ticketId,
-          subdomain: '<%= @origin %>',
+          zendesk: {
+              subdomain: '<%= @origin %>'
+          }
           })
       });
       const data = await response.json();
-      if (data.status == 'success') {
+
+      if (data.status === 'success') {
           userKey = data.user_key;
           accountKey = data.account_key;
           sendBtn.href = `<%= Rails.configuration.variables[:base_url] %>recordings/new?zid=${ticketId}&ak=${data.account_key}&key=${data.user_key}&src=srz`;
       } else {
-          if (data.error == "Account not found") {
-              client.invoke('resize', { width: '200px', height: '220px' })
-              actionsContainer.innerHTML = `
-              <div class="text-center mx-auto>
-              <a href="https://app.screendesk.io" target="_blank"><%= image_tag "logo_new.svg", class: "mb-6 mt-3 h-5 mx-auto" %></a>
-              <p class="elements text-sm mt-2">Sign in to connect your account. Refresh this page once connected.</p>
-              <a id="signin-button" href="<%= @origin %>/oauth/authorizations/new?response_type=code&client_id=zdg-screendesk&redirect_uri=<%= Rails.configuration.variables[:base_url] %>apps/zendesk/connect&scope=read%20write&state=<%= @origin %>" target="_blank" class="inline-block border w-1/2 p-1 mt-4 btn-primary outline">Sign in</a>
-              </div>`;
-          } else if (data.error == "Please ask an admin to add you to Screendesk") {
-              client.invoke('resize', { width: '200px', height: '150px' })
-              actionsContainer.innerHTML = `
-              <div class="text-center mx-auto>
-              <a href="https://app.screendesk.io" target="_blank"><%= image_tag "logo_new.svg", class: "mb-6 mt-3 h-5 mx-auto" %></a>
-              <p class="elements text-sm mt-2 text-gray-500">You need to have a Screendesk account in order to use this app.</p>
-              </div>
-              `;
-          } else {
-              actionsContainer.innerHTML = `
-              <div class="text-center mx-auto>
-              <a href="https://app.screendesk.io" target="_blank"><%= image_tag "logo_new.svg", class: "mb-6 mt-3 h-5 mx-auto" %></a>
-              <p class="elements text-sm mt-2 text-gray-500">You need to have a Screendesk account in order to use this app.</p>
-              </div>`;
+          client.invoke('resize', { width: '200px', height: '220px' });
+
+          switch (response.status) {
+              case 404:
+                  actionsContainer.innerHTML = `
+                          <div class="text-center mx-auto">
+                              <p class="text-sm text-gray-500">Account not found</p>
+                              <a id="signin-button" href="<%= @origin %>/oauth/authorizations/new?response_type=code&client_id=zdg-screendesk&redirect_uri=<%= Rails.configuration.variables[:base_url] %>apps/zendesk/connect&scope=read%20write&state=<%= @origin %>" target="_blank" class="inline-block border w-1/2 p-1 mt-4 btn-primary outline">Sign in</a>
+                          </div>`;
+                  break;
+
+              case 401:
+                  actionsContainer.innerHTML = `
+                          <p class="text-sm text-gray-500">${data.error}</p>`;
+                  break;
+
+              case 403:
+                  actionsContainer.innerHTML = `
+                          <p class="text-sm text-gray-500">${data.error}</p>`;
+                  break;
+
+              default:
+                  actionsContainer.innerHTML = `
+                          <p class="text-sm text-gray-500">An unexpected error occurred. Please try again later.</p>`;
           }
       }
   }
 
   function loadPage() {
-      getDetailsFromServer().then(() => {
-      sendBtn.addEventListener('click', function(e) {
-          client.invoke('app.close');
-      });
+    getDetailsFromServer().then(() => {
+        sendBtn.addEventListener('click', function(e) {
+            client.invoke('app.close');
+        });
 
-      requestBtn.addEventListener("click", async function(e) {
-          e.preventDefault();
-          const data = await getLink("rrz");
-          const capability = await client.get('ticket.editor.capabilities.richText')
-          if (capability['ticket.editor.capabilities.richText'] === true) {
-              client.invoke('ticket.editor.insert', `<a href="<%= Rails.configuration.variables[:base_url] %>r/${data}">Click here to record your screen</a>`);
-          } else {
-              client.invoke('ticket.editor.insert', ` to record your screen: <%= Rails.configuration.variables[:base_url] %>r/${data}`);
-          }
-          client.invoke('app.close');
-      });
+        requestBtn.addEventListener("click", async function(e) {
+            e.preventDefault();
+            const data = await getLink("rrz");
+            const capability = await client.get('ticket.editor.capabilities.richText');
+            const link = `<%= Rails.configuration.variables[:base_url] %>r/${data}`;
+            let textToInsert;
 
-      liveBtn.addEventListener("click", async function(e) {
-          e.preventDefault();
-          const data = await getLink("lsz");
-          client.invoke('ticket.editor.insert', `Join the live session here: <%= Rails.configuration.variables[:base_url] %>r/${data}`);
-          client.invoke('app.close');
-      });
-  });
+            if (capability['ticket.editor.capabilities.richText'] === true) {
+                textToInsert = replaceLinkWithCustomText(zendeskRequestRecordingText, link);
+            } else {
+                textToInsert = replaceLinkPlaceholder(zendeskChatRequestRecordingText, link);
+            }
+            client.invoke('ticket.editor.insert', textToInsert);
+            client.invoke('app.close');
+        });
 
-  client.get('ticket.comments').then(function(data) {
-      console.log(data);
+        liveBtn.addEventListener("click", async function(e) {
+            e.preventDefault();
+            const data = await getLink("lsz");
+            const link = `<%= Rails.configuration.variables[:base_url] %>r/${data}`;
+            const liveText = replaceLinkPlaceholder(zendeskLiveText, link);
+
+            client.invoke('ticket.editor.insert', liveText);
+            client.invoke('app.close');
+        });
+    });
+
+    client.get('ticket.comments').then(function(data) {
+        console.log(data);
+    });
   }
-  );
+
+  function replaceLinkPlaceholder(text, link) {
+    return text.replace(/{{link}}/g, link);
+  }
+
+  function replaceLinkWithCustomText(text, link) {
+    // Replace {{...}} with an anchor tag containing the custom text
+    const customTextRegex = /{{(.*?)}}/g;
+    text = text.replace(customTextRegex, (match, p1) => `<a href="${link}">${p1}</a>`);
+
+    // Replace {{link}} with just the link URL
+    text = text.replace(/{{link}}/g, link);
+
+    return text;
   }
 
   loadPage();

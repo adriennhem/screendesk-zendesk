@@ -108,6 +108,8 @@
 
     client.invoke('resize', { width: '200px', height: '250px' })
 
+
+
      searchInput.addEventListener('input', () => {
     if (searchInput.value) {
       clearInput.classList.remove('hidden');
@@ -130,7 +132,7 @@
       const response = await fetch(`/apps/zendesk/search?query=${encodeURIComponent(query)}&subdomain=${encodeURIComponent(subdomain)}&email=${encodeURIComponent(userEmail)}`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
       });
       return await response.json();
@@ -257,7 +259,7 @@
         const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/create-link', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 user_key: userKey,
@@ -278,19 +280,28 @@
         const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/get-details', {
             method: 'POST',
             headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
             },
             body: JSON.stringify({
             user_email: userEmail,
             ticket_id: ticketId,
-            subdomain: '<%= @origin %>',
+            subdomain: '<%= @origin %>'
             })
         });
+
+        if (!response.ok) {
+            const error = new Error(`HTTP ${response.status}`);
+            error.status = response.status;
+            error.response = response;
+            throw error;
+        }
+
         const data = await response.json();
         if (data.status == 'success') {
             userKey = data.user_key;
             accountKey = data.account_key;
             sendBtn.href = `<%= Rails.configuration.variables[:base_url] %>recordings/new?zid=${ticketId}&ak=${data.account_key}&key=${data.user_key}&src=srz`;
+            return data;
         } else {
             switch (response.status) {
                 case 404:
@@ -299,11 +310,6 @@
                             <p class="text-sm text-gray-500">Account not found</p>
                             <a id="signin-button" href="<%= @origin %>/oauth/authorizations/new?response_type=code&client_id=zdg-screendesk&redirect_uri=<%= Rails.configuration.variables[:base_url] %>apps/zendesk/connect&scope=read%20write&state=<%= @origin %>" target="_blank" class="inline-block border w-1/2 p-1 mt-4 btn-primary outline">Sign in</a>
                         </div>`;
-                    break;
-
-                case 401:
-                    actionsContainer.innerHTML = `
-                            <p class="text-sm text-gray-500">${data.error}</p>`;
                     break;
 
                 case 403:
@@ -316,6 +322,7 @@
                             <p class="text-sm text-gray-500">An unexpected error occurred. Please try again later.</p>`;
             }
             previousRecordings.classList.add('hidden');
+            throw new Error(data.error || 'Request failed');
         }
     }
 
@@ -324,13 +331,13 @@
         const response = await fetch('<%= Rails.configuration.variables[:base_url] %>apps/zendesk/get-recordings', {
             method: 'POST',
             headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
             },
             body: JSON.stringify({
             user_key: userKey,
             account_key: accountKey,
             customer_email: customerEmail,
-            ticket_id: ticketId,
+            ticket_id: ticketId
             })
         });
         const data = await response.json();
@@ -357,8 +364,12 @@
     }
 
     client.on('app.registered', async function() {
-      await getDetailsFromServer();
-      await getRecordings();
+      try {
+        await getDetailsFromServer();
+        await getRecordings();
+      } catch (error) {
+        console.error('Error initializing app:', error);
+      }
 
       requestBtn.addEventListener("click", async function(e) {
           e.preventDefault();
@@ -402,6 +413,92 @@
     client.on('ticket.updated', async function() {
         await getRecordings();
     });
+
+    // Listen for bi-monthly reminder notifications from server
+    client.on('api_notification.screendesk_activity_reminder', function(data) {
+        console.log('Received Screendesk activity reminder:', data);
+        showActivityReminderNotification(data.body);
+    });
+
+    // Listen for invitation reminder notifications from server
+    client.on('api_notification.screendesk_invitation_reminder', function(data) {
+        console.log('Received Screendesk invitation reminder:', data);
+        showInvitationReminderNotification(data.body);
+    });
+
+    function showActivityReminderNotification(reminderData) {
+        const data = reminderData || {};
+        const totalCount = data.recording_count || 0;
+        const sentCount = data.sent_count || 0;
+        const receivedCount = data.received_count || 0;
+        const daysSinceLastActivity = data.days_since_last_activity || 0;
+
+        let message;
+        if (totalCount === 0) {
+            message = `
+                <div style="display: flex; align-items: center;">
+                    <div style="margin-right: 12px;">📹</div>
+                    <div>
+                        <strong>Screendesk Available</strong><br>
+                        <span style="font-size: 13px;">Request screen recordings from customers to resolve technical issues faster. Access the Screendesk app through your sidebar or ticket editor.</span>
+                    </div>
+                </div>
+            `;
+        } else if (daysSinceLastActivity > 14) {
+            let activityText = '';
+            if (sentCount > 0 && receivedCount > 0) {
+                activityText = `You've processed ${totalCount} recordings (${sentCount} sent, ${receivedCount} received).`;
+            } else if (sentCount > 0) {
+                activityText = `You've sent ${sentCount} recording${sentCount !== 1 ? 's' : ''}.`;
+            } else if (receivedCount > 0) {
+                activityText = `You've received ${receivedCount} recording${receivedCount !== 1 ? 's' : ''}.`;
+            }
+
+            message = `
+                <div style="display: flex; align-items: center;">
+                    <div style="margin-right: 12px;">📹</div>
+                    <div>
+                        <strong>Screendesk Activity Summary</strong><br>
+                        <span style="font-size: 13px;">${activityText} Continue requesting recordings from customers to resolve technical issues faster.</span>
+                    </div>
+                </div>
+            `;
+        } else {
+            message = `
+                <div style="display: flex; align-items: center;">
+                    <div style="margin-right: 12px;">📹</div>
+                    <div>
+                        <strong>Screendesk Ready</strong><br>
+                        <span style="font-size: 13px;">Request screen recordings from customers to resolve technical issues faster. Use the Screendesk app in your sidebar or ticket editor.</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        client.invoke('notify', message, 'notice', 8000);
+    }
+
+    function showInvitationReminderNotification(invitationData) {
+        const data = invitationData || {};
+        const invitationEmail = data.invitation_email || 'someone';
+        const invitationName = data.invitation_name || 'A team member';
+        const daysSinceInvitation = data.days_since_invitation || 0;
+        const accountName = data.account_name || 'your team';
+        const invitationUrl = data.invitation_url || '#';
+
+        let message = `
+            <div style="display: flex; align-items: center;">
+                <div style="margin-right: 12px;">✉️</div>
+                <div>
+                    <strong>Screendesk Invitation</strong><br>
+                    <span style="font-size: 13px;">You've been invited to join ${accountName} on Screendesk.</span><br>
+                    <a href="${invitationUrl}" target="_blank" style="color: #f43f5e; text-decoration: none; font-size: 13px; font-weight: 500;">Click here to accept your invitation →</a>
+                </div>
+            </div>
+        `;
+
+        client.invoke('notify', message, 'notice', 12000);
+    }
   </script>
 <% else %>
   <div class="text-center">
