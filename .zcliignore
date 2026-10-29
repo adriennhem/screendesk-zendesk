@@ -1,0 +1,9 @@
+.git/**
+.fdk/**
+log/**
+tmp/**
+.DS_Store
+README.md
+*.rb
+*.html.erb
+*.zip

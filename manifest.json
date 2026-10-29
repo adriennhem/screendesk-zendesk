@@ -15,7 +15,7 @@
       },
       "ticket_editor": {
         "url": "https://app.screendesk.io/apps/zendesk/ticket-editor",
-        "flexible": true ,
+        "flexible": true,
         "autoLoad": true
       },
       "background": {
@@ -23,6 +23,6 @@
       }
     }
   },
-  "version": "2.0.0",
+  "version": "2.1.0",
   "frameworkVersion": "2.0"
 }
