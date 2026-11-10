@@ -7,3 +7,4 @@ README.md
 *.rb
 *.html.erb
 *.zip
+submission/**
